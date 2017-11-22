@@ -387,6 +387,9 @@ function nnz(lu::UmfpackLU)
 end
 
 ### Solve with Factorization
+
+import Base.LinAlg.ldiv!
+
 ldiv!(lu::UmfpackLU{T}, B::StridedVecOrMat{T}) where {T<:UMFVTypes} =
     ldiv!(B, lu, copy(B))
 ldiv!(translu::Transpose{T,<:UmfpackLU{T}}, B::StridedVecOrMat{T}) where {T<:UMFVTypes} =

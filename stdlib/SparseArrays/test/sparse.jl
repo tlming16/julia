@@ -1,6 +1,6 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
-using Base.LinAlg: mul!, ldiv!, rdiv!
+using Base.LinAlg: mul!, rdiv!
 using Base.Printf: @printf
 using Random
 

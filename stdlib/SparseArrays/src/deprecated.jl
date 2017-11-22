@@ -221,6 +221,11 @@ end
 import Base: asyncmap
 @deprecate asyncmap(f, s::AbstractSparseArray...; kwargs...) sparse(asyncmap(f, map(Array, s)...; kwargs...))
 
+# A[ct]_(mul|ldiv|rdiv)_B[ct][!] methods from linalg.jl, to deprecate
+import Base: A_mul_B!, Ac_mul_B, Ac_mul_B!, At_mul_B, At_mul_B!
+import Base: A_mul_Bc, A_mul_Bt, Ac_mul_Bc, At_mul_Bt
+import Base: At_ldiv_B, Ac_ldiv_B, A_ldiv_B!
+import Base.LinAlg: At_ldiv_B!, Ac_ldiv_B!, A_rdiv_B!, A_rdiv_Bc!
 
 # END 0.7 deprecations
 
