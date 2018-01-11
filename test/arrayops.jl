@@ -1614,6 +1614,7 @@ end
     @test y !== nothing
     y = iterate(itr, y[2])
     @test y !== nothing
+    val, _ = y
     y = iterate(itr, y[2])
     @test y === nothing
     @test r[val] == 3
