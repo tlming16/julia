@@ -182,6 +182,8 @@ struct MIME{mime} end
 macro MIME_str(s)
     :(MIME{$(Expr(:quote, Symbol(s)))})
 end
+# fallback text/plain representation of any type:
+show(io::IO, ::MIME"text/plain", x) = show(io, x)
 
 # SIMD loops
 include("simdloop.jl")
@@ -419,7 +421,7 @@ include("channels.jl")
 include("deepcopy.jl")
 include("interactiveutil.jl")
 include("summarysize.jl")
-include("replutil.jl")
+include("errorshow.jl")
 include("i18n.jl")
 using .I18n
 
