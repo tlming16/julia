@@ -5936,3 +5936,9 @@ void24363 = A24363(nothing)
 f24363(a) = a.x
 @test f24363(int24363) === 65535
 @test f24363(void24363) === nothing
+
+# The old iteration protocol shims
+let A = [1]
+    @test next(A, start(A))[1] == 1
+    @test done(A, next(A, start(A))[2])
+end

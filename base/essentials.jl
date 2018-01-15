@@ -790,14 +790,55 @@ end
 const old_iterate_line_prev = (@__LINE__)
 iterate(x) = (@_inline_meta; iterate(x, start(x)))
 
-# This is necessary to support the above compatibility layer,
-# eventually, this should just check for applicability of `iterate`
-function isiterable(T)::Bool
+struct LegacyIterationCompat{T,S}
+    done::Bool
+    nextval::T
+    state::S
+    LegacyIterationCompat{T,S}() where {T,S} = new{T,S}(true)
+    LegacyIterationCompat{T,S}(nextval::T, state::S) where {T,S} = new{T,S}(false, nextval, state)
+end
+
+function has_non_default_iterate(T)
     world = ccall(:jl_get_world_counter, UInt, ())
     mt = Base._methods(iterate, Tuple{T}, -1, world)
     # Check if this is the above method
     if (mt[1][3].file == @__FILE_SYMBOL__) && (mt[1][3].line == old_iterate_line_prev + 1)
-        return length(Base._methods(start, Tuple{T}, -1, world)) != 0
+        return false
+    end
+    return true
+end
+
+const compat_start_line_prev = (@__LINE__)
+function start(itr::T) where {T}
+    has_non_default_iterate(T) || throw(MethodError(iterate, (itr,)))
+    y = iterate(itr)
+    y === nothing && return LegacyIterationCompat{Union{}}()
+    val, state = y
+    LegacyIterationCompat{typeof(val), typeof(state)}(val, state)
+end
+
+function next(itr::I, state::LegacyIterationCompat{T,S}) where {I,T,S}
+    val, state = state.nextval, state.state
+    y = iterate(itr, state)
+    if y === nothing
+        return (val, LegacyIterationCompat{T,S}())
+    end
+    nextval, state = y
+    val, LegacyIterationCompat{typeof(val), typeof(state)}(nextval, state)
+end
+
+done(itr, state::LegacyIterationCompat) = (@_inline_meta; state.done)
+
+# This is necessary to support the above compatibility layer,
+# eventually, this should just check for applicability of `iterate`
+function isiterable(T)::Bool
+    if !has_non_default_iterate(T)
+        world = ccall(:jl_get_world_counter, UInt, ())
+        mt = Base._methods(start, Tuple{T}, -1, world)
+        # Check if this is the fallback start method
+        if (mt[1][3].file == @__FILE_SYMBOL__) && (mt[1][3].line == compat_start_line_prev + 2)
+            return false
+        end
     end
     return true
 end
