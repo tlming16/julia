@@ -144,8 +144,8 @@ module IteratorsMD
 
     # nextind with CartesianIndex
     function Base.nextind(a::AbstractArray{<:Any,N}, i::CartesianIndex{N}) where {N}
-        ind, _ = iterate(CartesianIndices(axes(a)), i)
-        return ind
+        iter = CartesianIndices(axes(a))
+        return CartesianIndex(inc(i.I, first(iter).I, last(iter).I))
     end
 
     # Iteration over the elements of CartesianIndex cannot be supported until its length can be inferred,
