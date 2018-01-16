@@ -790,12 +790,12 @@ end
 const old_iterate_line_prev = (@__LINE__)
 iterate(x) = (@_inline_meta; iterate(x, start(x)))
 
-struct LegacyIterationCompat{T,S}
+struct LegacyIterationCompat{I,T,S}
     done::Bool
     nextval::T
     state::S
-    LegacyIterationCompat{T,S}() where {T,S} = new{T,S}(true)
-    LegacyIterationCompat{T,S}(nextval::T, state::S) where {T,S} = new{T,S}(false, nextval, state)
+    LegacyIterationCompat{I,T,S}() where {I,T,S} = new{I,T,S}(true)
+    LegacyIterationCompat{I,T,S}(nextval::T, state::S) where {I,T,S} = new{I,T,S}(false, nextval, state)
 end
 
 function has_non_default_iterate(T)
@@ -812,23 +812,22 @@ const compat_start_line_prev = (@__LINE__)
 function start(itr::T) where {T}
     has_non_default_iterate(T) || throw(MethodError(iterate, (itr,)))
     y = iterate(itr)
-    y === nothing && return LegacyIterationCompat{Union{}}()
+    y === nothing && return LegacyIterationCompat{T, Union{}, Union{}}()
     val, state = y
-    LegacyIterationCompat{typeof(val), typeof(state)}(val, state)
+    LegacyIterationCompat{T, typeof(val), typeof(state)}(val, state)
 end
 
-function next(itr::I, state::LegacyIterationCompat{T,S}) where {I,T,S}
+function next(itr::I, state::LegacyIterationCompat{I,T,S}) where {I,T,S}
     val, state = state.nextval, state.state
     y = iterate(itr, state)
     if y === nothing
-        return (val, LegacyIterationCompat{T,S}())
+        return (val, LegacyIterationCompat{I,T,S}())
     end
     nextval, state = y
-    val, LegacyIterationCompat{typeof(val), typeof(state)}(nextval, state)
+    val, LegacyIterationCompat{I, typeof(val), typeof(state)}(nextval, state)
 end
 
-done(itr, state::LegacyIterationCompat) = (@_inline_meta; state.done)
-
+done(itr::I, state::LegacyIterationCompat{I,T,S}) where {I,T,S} = (@_inline_meta; state.done)
 # This is necessary to support the above compatibility layer,
 # eventually, this should just check for applicability of `iterate`
 function isiterable(T)::Bool

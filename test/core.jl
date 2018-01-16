@@ -5938,7 +5938,17 @@ f24363(a) = a.x
 @test f24363(void24363) === nothing
 
 # The old iteration protocol shims
-let A = [1]
+struct DelegateIterator{T}
+    x::T
+end
+Base.start(itr::DelegateIterator) = start(itr.x)
+Base.next(itr::DelegateIterator, state) = next(itr.x, state)
+Base.done(itr::DelegateIterator, state) = done(itr.x, state)
+let A = [1], B = [], C = DelegateIterator([1]), D = DelegateIterator([])
     @test next(A, start(A))[1] == 1
     @test done(A, next(A, start(A))[2])
+    @test done(B, start(B))
+    @test next(C, start(C))[1] == 1
+    @test done(C, next(C, start(C))[2])
+    @test done(D, start(D))
 end
