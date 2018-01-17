@@ -781,6 +781,16 @@ macro __FILE_SYMBOL__()
 end
 
 # Iteration
+
+"""
+    iterate(iter [, state]) -> Union{Nothing, Tuple{Any, Any}}
+
+Advance the iterator to obtain the next element. If no elements
+remain, nothing should be returned. Otherwise, a 2-tuple of the
+next element and the new iteration state should be returned.
+"""
+function iterate end
+
 # Compatibility with old iteration protocol
 function iterate(x, state)
     @_inline_meta

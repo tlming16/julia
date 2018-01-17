@@ -41,7 +41,7 @@ and_iteratoreltype(iel::T, ::T) where {T} = iel
 and_iteratoreltype(a, b) = EltypeUnknown()
 
 ## Reverse-order iteration for arrays and other collections.  Collections
-## should implement start/next/done etcetera if possible/practical.
+## should implement iterate etcetera if possible/practical.
 """
     Iterators.reverse(itr)
 
@@ -53,8 +53,8 @@ order to reverse it; see [`Base.reverse`](@ref) for an eager implementation.
 
 Not all iterator types `T` support reverse-order iteration.  If `T`
 doesn't, then iterating over `Iterators.reverse(itr::T)` will throw a [`MethodError`](@ref)
-because of the missing [`start`](@ref), [`next`](@ref), and [`done`](@ref)
-methods for `Iterators.Reverse{T}`.  (To implement these methods, the original iterator
+because of the missing [`iterate`](@ref) methods for `Iterators.Reverse{T}`.
+(To implement these methods, the original iterator
 `itr::T` can be obtained from `r = Iterators.reverse(itr)` by `r.itr`.)
 
 # Examples
