@@ -824,7 +824,7 @@ function next(itr::I, state::LegacyIterationCompat{I,T,S}) where {I,T,S}
         return (val, LegacyIterationCompat{I,T,S}())
     end
     nextval, state = y
-    val, LegacyIterationCompat{I, typeof(val), typeof(state)}(nextval, state)
+    val, LegacyIterationCompat{I, typeof(nextval), typeof(state)}(nextval, state)
 end
 
 done(itr::I, state::LegacyIterationCompat{I,T,S}) where {I,T,S} = (@_inline_meta; state.done)
