@@ -2,11 +2,12 @@
 
 # test core language features
 
+using Base.GC
 using Random
+using SparseArrays
 
 const Bottom = Union{}
 
-using SparseArrays
 
 # For curmod_*
 include("testenv.jl")
@@ -4026,16 +4027,16 @@ end
 end
 # disable GC to make sure no collection/promotion happens
 # when we are constructing the objects
-let gc_enabled13995 = gc_enable(false)
+let gc_enabled13995 = GC.enable(false)
     finalized13995 = [false, false, false, false]
     create_dead_object13995(finalized13995)
-    gc_enable(true)
+    GC.enable(true)
     # obj is unreachable and young, a single young gc should collect it
     # and trigger all the finalizers.
     gc(false)
-    gc_enable(false)
+    GC.enable(false)
     @test finalized13995 == [true, true, true, true]
-    gc_enable(gc_enabled13995)
+    GC.enable(gc_enabled13995)
 end
 
 # issue #15283
@@ -4830,7 +4831,7 @@ end
 # issue #17255, take `deferred_alloc` into account
 # when calculating total allocation size.
 @noinline function f17255(n)
-    gc_enable(false)
+    GC.enable(false)
     b0 = Base.gc_bytes()
     local a
     for i in 1:n
@@ -4844,7 +4845,7 @@ end
     return true, a
 end
 @test f17255(10000)[1]
-gc_enable(true)
+GC.enable(true)
 
 # issue #18710
 bad_tvars() where {T} = 1

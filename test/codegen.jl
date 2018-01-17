@@ -3,6 +3,7 @@
 # tests for codegen and optimizations
 
 using Random
+using Base.GC
 
 const opt_level = Base.JLOptions().opt_level
 const coverage = (Base.JLOptions().code_coverage > 0) || (Base.JLOptions().malloc_log > 0)

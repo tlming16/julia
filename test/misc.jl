@@ -1,5 +1,7 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
+using Base.GC
+
 # Tests that do not really go anywhere else
 
 # test assert() method
@@ -83,12 +85,12 @@ let # test the process title functions, issue #9957
     @test Sys.get_process_title() == oldtitle
 end
 
-# test gc_enable/disable
-@test gc_enable(true)
-@test gc_enable(false)
-@test gc_enable(false) == false
-@test gc_enable(true) == false
-@test gc_enable(true)
+# test GC.enable/disable
+@test GC.enable(true)
+@test GC.enable(false)
+@test GC.enable(false) == false
+@test GC.enable(true) == false
+@test GC.enable(true)
 
 # test methodswith
 # `methodswith` relies on exported symbols

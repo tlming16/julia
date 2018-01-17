@@ -1,12 +1,12 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
-using Test, Distributed, SharedArrays, Random
+using Test, Distributed, SharedArrays, Random, Base.GC
 include(joinpath(Sys.BINDIR, "..", "share", "julia", "test", "testenv.jl"))
 
 addprocs_with_testenv(4)
 @test nprocs() == 5
 
-@everywhere using Test, SharedArrays
+@everywhere using Test, SharedArrays, Base.GC
 
 id_me = myid()
 id_other = filter(x -> x != id_me, procs())[rand(1:(nprocs()-1))]

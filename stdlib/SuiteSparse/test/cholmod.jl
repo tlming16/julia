@@ -3,6 +3,7 @@
 using SuiteSparse.CHOLMOD
 using DelimitedFiles
 using Test
+using Base.GC
 
 # CHOLMOD tests
 srand(123)

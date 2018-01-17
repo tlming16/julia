@@ -2,6 +2,7 @@
 
 using Test
 using Base.Threads
+using Base.GC
 
 # threading constructs
 

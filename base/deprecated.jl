@@ -2794,6 +2794,9 @@ end
 @deprecate findn(x::AbstractMatrix) (I = findall(!iszero, x); (getindex.(I, 1), getindex.(I, 2)))
 @deprecate findn(x::AbstractArray{T, N}) where {T, N} (I = findall(!iszero, x); ntuple(i -> getindex.(I, i), N))
 
+@deprecate gc GC.gc
+@deprecate gc_enable GC.enable
+
 # issue #9053
 if Sys.iswindows()
 function Filesystem.tempname(uunique::UInt32)

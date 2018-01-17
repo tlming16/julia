@@ -957,6 +957,8 @@ Deprecated or removed
 
   * `ObjectIdDict` has been deprecated in favor of `IdDict{Any,Any}` ([#25210]).
 
+  * `gc` and `gc_enable` have been deprecated in favor of `GC.gc` and `GC.enable` ([#25616]).
+
 Command-line option changes
 ---------------------------
 
@@ -1208,3 +1210,4 @@ Command-line option changes
 [#25424]: https://github.com/JuliaLang/julia/issues/25424
 [#25532]: https://github.com/JuliaLang/julia/issues/25532
 [#25545]: https://github.com/JuliaLang/julia/issues/25545
+[#25616]: https://github.com/JuliaLang/julia/issues/25616

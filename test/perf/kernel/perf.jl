@@ -1,5 +1,7 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
+using Base.GC
+
 include("../perfutil.jl")
 
 abstract type List{T} end

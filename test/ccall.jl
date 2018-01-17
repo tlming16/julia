@@ -2,6 +2,7 @@
 
 import Base.copy, Base.==
 using Random
+using Base.GC
 
 import Libdl
 

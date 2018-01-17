@@ -1,6 +1,6 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
-using Test, FileWatching
+using Test, FileWatching, Base.GC
 
 # This script does the following
 # Sets up n unix pipes

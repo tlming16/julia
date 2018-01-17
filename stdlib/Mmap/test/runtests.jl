@@ -1,6 +1,6 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
-using Test, Mmap, Random
+using Test, Mmap, Random, Base.GC
 
 file = tempname()
 write(file, "Hello World\n")

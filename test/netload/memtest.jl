@@ -1,5 +1,7 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
+using Base.GC
+
 struct RUsage
     ru_utime_sec::Clong         #  user CPU time used
     ru_utime_usec::Clong        #  user CPU time used
