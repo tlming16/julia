@@ -78,3 +78,98 @@ mktempdir() do dir
         end
     end
 end
+
+import Base: UUID
+
+saved_load_path = copy(LOAD_PATH)
+empty!(LOAD_PATH)
+push!(LOAD_PATH, "project")
+@test Base.load_path() == [abspath("project","Project.toml")]
+
+@testset "project & manifest identify_package & locate_package" begin
+    local path
+    for (names, path, uuid) in [
+        ("Foo",     "Foo1/src/Foo.jl",    "767738be-2f1f-45a9-b806-0234f3164144"),
+        ("Bar.Foo", "Foo2.jl/src/Foo.jl", "6f418443-bd2e-4783-b551-cdbac608adf2"),
+        ("Bar",     "Bar/src/Bar.jl",     "2a550a13-6bab-4a91-a4ee-dff34d6b99d0"),
+        ("Foo.Baz", "Baz.jl/src/Baz.jl",  "6801f525-dc68-44e8-a4e8-cabd286279e7"),
+        ("Foo.Qux", "Qux.jl",             "b5ec9b9c-e354-47fd-b367-a348bdc8f909"),
+    ]
+        n = map(String, split(names, '.'))
+        pkg = Base.identify_package(n...)
+        @test pkg == Base.PkgId(UUID(uuid), n[end])
+        p = joinpath(@__DIR__, "project", "deps", normpath(path))
+        @test p == Base.locate_package(pkg)
+    end
+    @test Base.identify_package("Baz") == nothing
+    @test Base.identify_package("Qux") == nothing
+    @testset "equivalent package names" begin
+        local classes = [
+            ["Foo"],
+            ["Bar", "Foo.Bar"],
+            ["Foo.Baz", "Bar.Baz", "Foo.Bar.Baz"],
+            ["Bar.Foo", "Foo.Bar.Foo", "Foo.Baz.Foo", "Bar.Baz.Foo"],
+            ["Foo.Qux", "Foo.Baz.Qux", "Bar.Baz.Qux", "Foo.Bar.Foo.Qux",
+             "Bar.Foo.Qux", "Foo.Baz.Foo.Qux", "Bar.Baz.Foo.Qux", "Foo.Bar.Baz.Foo.Qux"],
+            ["Baz", "Qux", "Bar.Qux", "Bar.Baz.Bar", "Bar.Foo.Bar", "Bar.Foo.Baz",
+             "Bar.Foo.Qux.Foo", "Bar.Foo.Qux.Bar", "Bar.Foo.Qux.Baz"],
+        ]
+        for i = 1:length(classes)
+            A = classes[i]
+            for x in A
+                X = Base.identify_package(map(String, split(x, '.'))...)
+                for y in A
+                    Y = Base.identify_package(map(String, split(y, '.'))...)
+                    @test X == Y
+                end
+                for j = i+1:length(classes)
+                    B = classes[j]
+                    for z in B
+                        Z = Base.identify_package(map(String, split(z, '.'))...)
+                        @test X != Z
+                    end
+                end
+            end
+        end
+    end
+end
+
+@testset "project & manifest import" begin
+    @test !@isdefined Foo
+    @test !@isdefined Bar
+    import Foo
+    @test @isdefined Foo
+    @test !@isdefined Bar
+    import Bar
+    @test @isdefined Foo
+    @test @isdefined Bar
+
+    @testset "module graph structure" begin
+        local classes = Dict(
+            "Foo1" => [Foo],
+            "Bar"  => [Bar, Foo.Bar],
+            "Baz"  => [Foo.Baz, Bar.Baz, Foo.Bar.Baz],
+            "Foo2" => [Bar.Foo, Foo.Bar.Foo, Foo.Baz.Foo, Bar.Baz.Foo],
+            "Qux"  => [Foo.Qux, Foo.Baz.Qux, Bar.Baz.Qux, Foo.Bar.Foo.Qux,
+                       Bar.Foo.Qux, Foo.Baz.Foo.Qux, Bar.Baz.Foo.Qux,
+                       Foo.Bar.Baz.Foo.Qux],
+        )
+        for (i, (this, mods)) in enumerate(classes)
+            for x in mods
+                @test x.this == this
+                for y in mods
+                    @test x === y
+                end
+                for (j, (that, mods′)) in enumerate(classes)
+                    i == j && continue
+                    for z in mods′
+                        @test x !== z
+                    end
+                end
+            end
+        end
+    end
+end
+
+empty!(LOAD_PATH)
+append!(LOAD_PATH, saved_load_path)
