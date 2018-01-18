@@ -948,6 +948,8 @@ Deprecated or removed
 
   * The module `Random.dSFMT` is renamed `Random.DSFMT` ([#25567]).
 
+  * `module_name` has been deprecated in favor of a method of the `Symbol` constructor.
+
   * The generic implementations of `strides(::AbstractArray)` and `stride(::AbstractArray, ::Int)`
      have been deprecated. Subtypes of `AbstractArray` that implement the newly introduced strided
      array interface should define their own `strides` method ([#25321]).

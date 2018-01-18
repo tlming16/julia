@@ -358,7 +358,7 @@ function serialize_mod_names(s::AbstractSerializer, m::Module)
         serialize(s, Base.root_module_key(m))
     else
         serialize_mod_names(s, module_parent(m))
-        serialize(s, module_name(m))
+        serialize(s, Symbol(m))
     end
 end
 

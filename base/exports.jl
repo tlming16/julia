@@ -888,7 +888,6 @@ export
     method_exists,
     methods,
     methodswith,
-    module_name,
     module_parent,
     names,
     varinfo,

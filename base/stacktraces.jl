@@ -350,7 +350,7 @@ function from(frame::StackFrame, m::Module)
     if finfo isa Core.MethodInstance
         frame_m = finfo.def
         isa(frame_m, Method) && (frame_m = frame_m.module)
-        result = module_name(frame_m) === module_name(m)
+        result = Symbol(frame_m) === Symbol(m)
     end
 
     return result

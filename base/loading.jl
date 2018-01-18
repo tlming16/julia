@@ -127,7 +127,7 @@ function _include_from_serialized(path::String, depmods::Vector{Any})
                 push!(Base.Docs.modules, M)
             end
             if module_parent(M) === M
-                register_root_module(module_name(M), M)
+                register_root_module(Symbol(M), M)
             end
         end
     end
@@ -137,7 +137,7 @@ end
 function _tryrequire_from_serialized(modname::Symbol, uuid::UInt64, modpath::Union{Nothing, String})
     if root_module_exists(modname)
         M = root_module(modname)
-        if module_name(M) === modname && module_uuid(M) === uuid
+        if Symbol(M) === modname && module_uuid(M) === uuid
             return M
         end
     else
@@ -151,7 +151,7 @@ function _tryrequire_from_serialized(modname::Symbol, uuid::UInt64, modpath::Uni
                 invokelatest(callback, modname)
             end
             for M in mod::Vector{Any}
-                if module_name(M) === modname && module_uuid(M) === uuid
+                if Symbol(M) === modname && module_uuid(M) === uuid
                     return M
                 end
             end
@@ -346,7 +346,7 @@ function register_root_module(key, m::Module)
     if haskey(loaded_modules, key)
         oldm = loaded_modules[key]
         if oldm !== m
-            name = module_name(oldm)
+            name = Symbol(oldm)
             @warn "Replacing module `$name`"
         end
     end
@@ -769,7 +769,7 @@ function stale_cachefile(modpath::String, cachefile::String)
             # Module is already loaded
             if root_module_exists(mod)
                 M = root_module(mod)
-                if module_name(M) === mod && module_uuid(M) === uuid_req
+                if Symbol(M) === mod && module_uuid(M) === uuid_req
                     depmods[i] = M
                 else
                     @debug "Rejecting cache file $cachefile because module $name is already loaded and incompatible."
