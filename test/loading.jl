@@ -82,24 +82,25 @@ end
 import Base: UUID
 
 saved_load_path = copy(LOAD_PATH)
-empty!(LOAD_PATH)
-push!(LOAD_PATH, "project")
+saved_depot_path = copy(DEPOT_PATH)
+push!(empty!(LOAD_PATH), "project")
+push!(empty!(DEPOT_PATH), "depot")
+
 @test Base.load_path() == [abspath("project","Project.toml")]
 
 @testset "project & manifest identify_package & locate_package" begin
     local path
-    for (names, path, uuid) in [
-        ("Foo",     "Foo1/src/Foo.jl",    "767738be-2f1f-45a9-b806-0234f3164144"),
-        ("Bar.Foo", "Foo2.jl/src/Foo.jl", "6f418443-bd2e-4783-b551-cdbac608adf2"),
-        ("Bar",     "Bar/src/Bar.jl",     "2a550a13-6bab-4a91-a4ee-dff34d6b99d0"),
-        ("Foo.Baz", "Baz.jl/src/Baz.jl",  "6801f525-dc68-44e8-a4e8-cabd286279e7"),
-        ("Foo.Qux", "Qux.jl",             "b5ec9b9c-e354-47fd-b367-a348bdc8f909"),
+    for (names, uuid, path) in [
+        ("Foo",     "767738be-2f1f-45a9-b806-0234f3164144", "project/deps/Foo1/src/Foo.jl"       ),
+        ("Bar.Foo", "6f418443-bd2e-4783-b551-cdbac608adf2", "project/deps/Foo2.jl/src/Foo.jl"    ),
+        ("Bar",     "2a550a13-6bab-4a91-a4ee-dff34d6b99d0", "project/deps/Bar/src/Bar.jl"        ),
+        ("Foo.Baz", "6801f525-dc68-44e8-a4e8-cabd286279e7", "depot/packages/9HkB/TCSb/src/Baz.jl"),
+        ("Foo.Qux", "b5ec9b9c-e354-47fd-b367-a348bdc8f909", "project/deps/Qux.jl"                ),
     ]
         n = map(String, split(names, '.'))
         pkg = Base.identify_package(n...)
         @test pkg == Base.PkgId(UUID(uuid), n[end])
-        p = joinpath(@__DIR__, "project", "deps", normpath(path))
-        @test p == Base.locate_package(pkg)
+        @test joinpath(@__DIR__, normpath(path)) == Base.locate_package(pkg)
     end
     @test Base.identify_package("Baz") == nothing
     @test Base.identify_package("Qux") == nothing
@@ -169,7 +170,8 @@ end
             end
         end
     end
+    @test Foo.which == "path"
 end
 
-empty!(LOAD_PATH)
-append!(LOAD_PATH, saved_load_path)
+append!(empty!(DEPOT_PATH), saved_depot_path)
+append!(empty!(LOAD_PATH), saved_load_path)
